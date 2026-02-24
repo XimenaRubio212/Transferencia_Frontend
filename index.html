@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Registro de Mensajes - Ejercicio DOM</title>
     <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
 </head>
 <body>
     <div class="container">
@@ -23,7 +24,7 @@
                 <form id="searchForm" class="form">
                     <div class="form__group">
                         <label for="userDoc" class="form__label">Documento del Usuario</label>
-                        <input type="text" id="userDoc" class="form__input" placeholder="Ej: 10101" required>
+                        <input type="text" id="userDoc" name="documento" class="form__input" placeholder="Ej: 10101" required>
                         <span class="form__error" id="searchError"></span>
                     </div>
                     <button type="submit" class="btn btn--primary" id="searchBtn">
@@ -42,6 +43,7 @@
 
 
         <!-- Formulario de entrada -->
+    <div id="taskSection" class="hidden">
         <section class="form-section">
             <div class="card">
                 <h2 class="card__title">Nuevo Mensaje</h2>
@@ -54,6 +56,7 @@
                         <input 
                             type="text" 
                             id="usertarea" 
+                            name="usertarea"
                             class="form__input" 
                             placeholder="Ingrese el titulo de la tarea"
                             aria-required="true"
@@ -67,8 +70,9 @@
                         </label>
                         <textarea 
                             id="userMessage" 
+                            name="userMessage"
                             class="form__input form__textarea" 
-                            placeholder="Escribe el nombre de tu tarea..."
+                            placeholder="Escribe la descripcion de tu tarea..."
                             rows="4"
                             aria-required="true"
                         ></textarea>
@@ -79,25 +83,27 @@
                         <label for="taskStatus" class="form__label">
                             Estado de la tarea
                         </label>
-                        <select id="taskStatus" class="form__input">
+                        <select id="taskStatus" name="taskStatus" class="form__input">
                             
                             <option value="" disabled selected>Selecciona el estado</option>
                             <option value="En proceso">En proceso</option>
                             <option value="En listado">En listado</option>
                             <option value="Terminado">Terminado</option>
                         </select>
+                        <span class="form__error" id="taskStatusError"></span>
                     </div>
 
                         <div class="form__group">   
                             <label for="taskPriority" class="form__label">
                                 Prioridad
                             </label>
-                            <select  id="taskPriority" class="form__input">
+                            <select id="taskPriority" name="taskPriority" class="form__input">
                                 <option value="" disabled selected>Selecciona la prioridad</option>
                                 <option value="Alta">Alta</option>
                                 <option value="Media">Media</option>
                                 <option value="Baja">Baja</option>
                             </select>
+                            <span class="form__error" id="taskPriorityError"></span>
                         </div>
 
 
@@ -110,6 +116,7 @@
                 </form>
             </div>
         </section>
+    
 
         <!-- Área de mensajes -->
         <section class="messages-section">
@@ -129,13 +136,13 @@
                 </div>
             </div>
         </section>
+    </div>
 
         <!-- Footer informativo -->
         <footer class="footer">
             <p class="footer__text">Ejercicio de manipulación del DOM | SENA - Desarrollo Web</p>
         </footer>
-    </div>
 
-    <script src="script.js"></script>
+    <script type="module" src="script.js"></script>
 </body>
 </html>
