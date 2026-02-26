@@ -1,5 +1,5 @@
-Grupo 3
+## 👥 Integrantes y Roles
 
-1. Jaider Esparza
-2. Jensen Rodriguez
-3. Darcy Rubio
+*   **Líder de Proyecto:** Darcy Rubio 
+*   **Desarrollador Frontend:** Jensen Rodriguez
+*   **Desarrollador Backend:** Jaider Esparza
