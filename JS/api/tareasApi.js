@@ -5,7 +5,7 @@
 // lanzan un Error si la respuesta HTTP no fue exitosa.
 // ============================================================
 
-const URL_BASE = 'http://localhost:3000';
+const URL_BASE = 'http://localhost:3001';
 
 // --- USUARIOS ---
 
