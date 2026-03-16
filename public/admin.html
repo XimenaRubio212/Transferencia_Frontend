@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Panel Administrativo</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
+</head>
+<body>
+    <div class="container container--wide">
+
+        <!-- Encabezado -->
+        <header class="header">
+            <h1 class="header__title">Panel Administrativo</h1>
+            <p class="header__subtitle">Gestión de usuarios y tareas del sistema</p>
+            <nav class="nav-links">
+                <a href="index.html" class="nav-links__item">
+                    <i class="fa-solid fa-house"></i> Inicio
+                </a>
+                <a href="misTareas.html" class="nav-links__item">
+                    <i class="fa-solid fa-list-check"></i> Mis Tareas
+                </a>
+            </nav>
+        </header>
+
+        <!-- ============================================================
+             PANEL 1: GESTIÓN DE USUARIOS
+             ============================================================ -->
+        <section class="form-section">
+            <div class="card">
+                <div class="admin-panel__header">
+                    <h2 class="card__title">
+                        <i class="fa-solid fa-users"></i> Gestión de Usuarios
+                    </h2>
+                    <button id="btnNuevoUsuario" class="btn btn--primary">
+                        <i class="fa-solid fa-user-plus"></i>
+                        <span>Nuevo Usuario</span>
+                    </button>
+                </div>
+
+                <!-- Tabla de usuarios (se llena dinámicamente) -->
+                <div id="tablaUsuariosContenedor" class="tabla-contenedor">
+                    <p class="tabla__vacia">Cargando usuarios...</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- ============================================================
+             PANEL 2: GESTIÓN DE TAREAS
+             ============================================================ -->
+        <section class="form-section">
+            <div class="card">
+                <div class="admin-panel__header">
+                    <h2 class="card__title">
+                        <i class="fa-solid fa-list-check"></i> Gestión de Tareas
+                    </h2>
+                    <button id="btnNuevaTareaAdmin" class="btn btn--primary">
+                        <i class="fa-solid fa-plus"></i>
+                        <span>Nueva Tarea</span>
+                    </button>
+                </div>
+
+                <!-- Filtros -->
+                <div class="filtros-admin">
+                    <div class="filtros-admin__grupo">
+                        <label for="filtroUsuarioAdmin" class="form__label">Filtrar por usuario</label>
+                        <select id="filtroUsuarioAdmin" class="form__input">
+                            <option value="">Todos los usuarios</option>
+                        </select>
+                    </div>
+                    <div class="filtros-admin__grupo">
+                        <label for="filtroEstadoAdmin" class="form__label">Filtrar por estado</label>
+                        <select id="filtroEstadoAdmin" class="form__input">
+                            <option value="">Todos los estados</option>
+                            <option value="En proceso">En proceso</option>
+                            <option value="En listado">En listado</option>
+                            <option value="Terminado">Terminado</option>
+                        </select>
+                    </div>
+                    <div class="filtros-admin__acciones">
+                        <button id="btnFiltrarAdmin" class="btn btn--primary btn--small">
+                            <i class="fa-solid fa-filter"></i> Filtrar
+                        </button>
+                        <button id="btnLimpiarFiltro" class="btn btn--secondary btn--small">
+                            <i class="fa-solid fa-xmark"></i> Limpiar
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Tabla de tareas (se llena dinámicamente) -->
+                <div id="tablaTareasContenedor" class="tabla-contenedor">
+                    <p class="tabla__vacia">Cargando tareas...</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Footer -->
+        <footer class="footer">
+            <p class="footer__text">Panel Administrativo | SENA - Desarrollo Web</p>
+        </footer>
+
+    </div><!-- /container -->
+
+    <!-- ============================================================
+         MODAL: CREAR / EDITAR USUARIO
+         ============================================================ -->
+    <div id="modalUsuario" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="modalUsuarioTitulo">
+        <div class="modal__contenido">
+            <div class="modal__encabezado">
+                <h3 class="modal__titulo" id="modalUsuarioTitulo">Crear Usuario</h3>
+                <button id="btnCerrarModalUsuario" class="modal__cerrar" aria-label="Cerrar">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+
+            <form id="formUsuario" class="form" novalidate>
+                <div class="form__group">
+                    <label for="usuNombre" class="form__label">Nombre completo</label>
+                    <input type="text" id="usuNombre" name="usuNombre" class="form__input"
+                           placeholder="Ej: Juan Pérez" aria-required="true">
+                    <span class="form__error" id="usuNombreError"></span>
+                </div>
+
+                <div class="form__group">
+                    <label for="usuCorreo" class="form__label">Correo electrónico</label>
+                    <input type="text" id="usuCorreo" name="usuCorreo" class="form__input"
+                           placeholder="Ej: juan@correo.com" aria-required="true">
+                    <span class="form__error" id="usuCorreoError"></span>
+                </div>
+
+                <div class="form__group">
+                    <label for="usuDocumento" class="form__label">Número de documento</label>
+                    <input type="text" id="usuDocumento" name="usuDocumento" class="form__input"
+                           placeholder="Ej: 12345678" aria-required="true">
+                    <span class="form__error" id="usuDocumentoError"></span>
+                </div>
+
+                <div class="form__group">
+                    <label for="usuRol" class="form__label">Rol</label>
+                    <select id="usuRol" name="usuRol" class="form__input">
+                        <option value="" disabled selected>Selecciona un rol</option>
+                        <option value="admin">Administrador</option>
+                        <option value="usuario">Usuario</option>
+                        <option value="supervisor">Supervisor</option>
+                    </select>
+                    <span class="form__error" id="usuRolError"></span>
+                </div>
+
+                <div class="modal__pie">
+                    <button type="button" id="btnCancelarUsuario" class="btn btn--secondary"
+                            onclick="document.getElementById('btnCerrarModalUsuario').click()">
+                        Cancelar
+                    </button>
+                    <button type="submit" class="btn btn--primary">
+                        <i class="fa-solid fa-floppy-disk"></i> Guardar
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- ============================================================
+         MODAL: CREAR / EDITAR TAREA ADMIN (con asignación múltiple)
+         ============================================================ -->
+    <div id="modalTareaAdmin" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="modalTareaTitulo">
+        <div class="modal__contenido modal__contenido--wide">
+            <div class="modal__encabezado">
+                <h3 class="modal__titulo" id="modalTareaTitulo">Crear Tarea</h3>
+                <button id="btnCerrarModalTarea" class="modal__cerrar" aria-label="Cerrar">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+
+            <form id="formTareaAdmin" class="form" novalidate>
+                <div class="form__grupo-doble">
+                    <div class="form__group">
+                        <label for="adminTitulo" class="form__label">Título de la tarea</label>
+                        <input type="text" id="adminTitulo" name="adminTitulo" class="form__input"
+                               placeholder="Ej: Revisar documentos" aria-required="true">
+                        <span class="form__error" id="adminTituloError"></span>
+                    </div>
+
+                    <div class="form__group">
+                        <label for="adminEstado" class="form__label">Estado</label>
+                        <select id="adminEstado" name="adminEstado" class="form__input">
+                            <option value="" disabled selected>Selecciona el estado</option>
+                            <option value="En proceso">En proceso</option>
+                            <option value="En listado">En listado</option>
+                            <option value="Terminado">Terminado</option>
+                        </select>
+                        <span class="form__error" id="adminEstadoError"></span>
+                    </div>
+                </div>
+
+                <div class="form__group">
+                    <label for="adminDescripcion" class="form__label">Descripción</label>
+                    <textarea id="adminDescripcion" name="adminDescripcion"
+                              class="form__input form__textarea"
+                              placeholder="Describe detalladamente la tarea..." rows="3"
+                              aria-required="true"></textarea>
+                    <span class="form__error" id="adminDescripcionError"></span>
+                </div>
+
+                <div class="form__grupo-doble">
+                    <div class="form__group">
+                        <label for="adminPrioridad" class="form__label">Prioridad</label>
+                        <select id="adminPrioridad" name="adminPrioridad" class="form__input">
+                            <option value="" disabled selected>Selecciona la prioridad</option>
+                            <option value="Alta">Alta</option>
+                            <option value="Media">Media</option>
+                            <option value="Baja">Baja</option>
+                        </select>
+                        <span class="form__error" id="adminPrioridadError"></span>
+                    </div>
+
+                    <!-- *** SELECTOR MÚLTIPLE DE USUARIOS *** -->
+                    <div class="form__group">
+                        <label for="adminUsuarios" class="form__label">
+                            Asignar usuarios
+                            <span class="form__label-hint">(Ctrl+clic para seleccionar varios)</span>
+                        </label>
+                        <select id="adminUsuarios" name="adminUsuarios" class="form__input form__select-multiple"
+                                multiple size="5" aria-label="Selecciona los usuarios a asignar">
+                            <!-- Se rellena dinámicamente -->
+                        </select>
+                        <span class="form__error" id="adminUsuariosError"></span>
+                    </div>
+                </div>
+
+                <div class="modal__pie">
+                    <button type="button" class="btn btn--secondary"
+                            onclick="document.getElementById('btnCerrarModalTarea').click()">
+                        Cancelar
+                    </button>
+                    <button type="submit" class="btn btn--primary">
+                        <i class="fa-solid fa-floppy-disk"></i> Guardar
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script type="module" src="JS/admin.js"></script>
+</body>
+</html>

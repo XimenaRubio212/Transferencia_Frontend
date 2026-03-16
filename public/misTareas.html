@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mis Tareas</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
+</head>
+<body>
+    <div class="container">
+
+        <!-- Encabezado -->
+        <header class="header">
+            <h1 class="header__title">Mis Tareas</h1>
+            <p class="header__subtitle">Consulta y gestiona las tareas asignadas a tu usuario</p>
+            <nav class="nav-links">
+                <a href="index.html" class="nav-links__item">
+                    <i class="fa-solid fa-house"></i> Inicio
+                </a>
+                <a href="admin.html" class="nav-links__item">
+                    <i class="fa-solid fa-shield-halved"></i> Panel Admin
+                </a>
+            </nav>
+        </header>
+
+        <!-- Búsqueda de usuario -->
+        <section class="form-section">
+            <div class="card">
+                <h2 class="card__title">
+                    <i class="fa-solid fa-magnifying-glass"></i> Buscar mis tareas
+                </h2>
+                <form id="formBuscarMisTareas" class="form" novalidate>
+                    <div class="form__group">
+                        <label for="inputDocMisTareas" class="form__label">Número de documento</label>
+                        <input type="text" id="inputDocMisTareas" name="inputDocMisTareas"
+                               class="form__input" placeholder="Ej: 10101" aria-required="true">
+                        <span class="form__error" id="errorMisTareas"></span>
+                    </div>
+                    <button type="submit" class="btn btn--primary">
+                        <i class="fa-solid fa-magnifying-glass"></i>
+                        <span class="btn__text">Ver mis tareas</span>
+                    </button>
+                </form>
+
+                <!-- Info del usuario encontrado -->
+                <div id="panelInfoMisTareas" class="user-info hidden">
+                    <div class="user-info__content">
+                        <p><strong>Nombre:</strong> <span id="miTareasNombre"></span></p>
+                        <p><strong>Correo:</strong>  <span id="miTareasCorreo"></span></p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Sección de tareas del usuario -->
+        <section id="seccionMisTareas" class="messages-section hidden">
+            <div class="messages-header">
+                <h2 class="messages-header__title">Tareas asignadas</h2>
+                <span class="messages-header__count" id="contadorMisTareas">0 Tarea(s)</span>
+            </div>
+
+            <div id="contenedorMisTareas" class="messages-container">
+                <!-- Estado vacío -->
+                <div class="messages-empty" id="estadoVacioMisTareas">
+                    <svg class="messages-empty__icon" width="64" height="64" viewBox="0 0 24 24"
+                         fill="none" stroke="currentColor">
+                        <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+                    </svg>
+                    <p class="messages-empty__text">No tienes tareas asignadas</p>
+                    <p class="messages-empty__subtext">Cuando te asignen tareas aparecerán aquí</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Footer -->
+        <footer class="footer">
+            <p class="footer__text">Vista de Usuario | SENA - Desarrollo Web</p>
+        </footer>
+
+    </div>
+
+    <script type="module" src="JS/misTareas.js"></script>
+</body>
+</html>
