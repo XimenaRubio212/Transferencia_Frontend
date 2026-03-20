@@ -3,7 +3,7 @@
 // Responsabilidad: comunicación HTTP con los endpoints de usuarios.
 // ============================================================
 
-const URL_BASE = 'http://localhost:3001';
+const URL_BASE = 'http://localhost:3000';
 
 /**
  * Obtiene la lista completa de usuarios del sistema.
@@ -66,7 +66,7 @@ export async function cambiarEstadoUsuarioEnServidor(id, activo) {
     const respuesta = await fetch(`${URL_BASE}/api/users/${id}/status`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ activo })
+        body: JSON.stringify({ estado: activo ? 'active' : 'inactive' })
     });
     if (!respuesta.ok) throw new Error('Error al cambiar el estado del usuario');
     return respuesta.json();

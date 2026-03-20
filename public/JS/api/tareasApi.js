@@ -5,7 +5,7 @@
 // lanzan un Error si la respuesta HTTP no fue exitosa.
 // ============================================================
 
-const URL_BASE = 'http://localhost:3001';
+const URL_BASE = 'http://localhost:3000';
 
 // --- USUARIOS ---
 
@@ -15,10 +15,11 @@ const URL_BASE = 'http://localhost:3001';
  * @returns {Object|null} El primer usuario encontrado, o null si no existe.
  */
 export async function obtenerUsuarioPorDocumento(documento) {
-    const respuesta = await fetch(`${URL_BASE}/usuarios?documento=${encodeURIComponent(documento)}`);
+    const respuesta = await fetch(`${URL_BASE}/api/users`);
     if (!respuesta.ok) throw new Error('Error al consultar el usuario');
     const usuarios = await respuesta.json();
-    return usuarios.length ? usuarios[0] : null;
+    const usuario = usuarios.find(u => u.documento === documento);
+    return usuario || null;
 }
 
 // --- TAREAS ---
@@ -29,7 +30,7 @@ export async function obtenerUsuarioPorDocumento(documento) {
  * @returns {Array} Lista de tareas.
  */
 export async function obtenerTareasPorUsuario(idUsuario) {
-    const respuesta = await fetch(`${URL_BASE}/tasks?userId=${idUsuario}`);
+    const respuesta = await fetch(`${URL_BASE}/api/users/${idUsuario}/tasks`);
     if (!respuesta.ok) throw new Error('Error al obtener las tareas');
     return respuesta.json();
 }
@@ -40,7 +41,7 @@ export async function obtenerTareasPorUsuario(idUsuario) {
  * @returns {Object} La tarea creada con su ID asignado.
  */
 export async function crearTareaEnServidor(datosTarea) {
-    const respuesta = await fetch(`${URL_BASE}/tasks`, {
+    const respuesta = await fetch(`${URL_BASE}/api/tasks`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(datosTarea)
@@ -56,8 +57,8 @@ export async function crearTareaEnServidor(datosTarea) {
  * @returns {Object} La tarea actualizada.
  */
 export async function actualizarTareaEnServidor(id, cambios) {
-    const respuesta = await fetch(`${URL_BASE}/tasks/${id}`, {
-        method: 'PATCH',
+    const respuesta = await fetch(`${URL_BASE}/api/tasks/${id}`, {
+        method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(cambios)
     });
@@ -71,6 +72,6 @@ export async function actualizarTareaEnServidor(id, cambios) {
  * @returns {boolean} true si se eliminó correctamente.
  */
 export async function borrarTareaEnServidor(id) {
-    const respuesta = await fetch(`${URL_BASE}/tasks/${id}`, { method: 'DELETE' });
+    const respuesta = await fetch(`${URL_BASE}/api/tasks/${id}`, { method: 'DELETE' });
     return respuesta.ok;
 }

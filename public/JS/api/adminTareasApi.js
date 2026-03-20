@@ -4,7 +4,7 @@
 // y la vista de usuario (mis tareas).
 // ============================================================
 
-const URL_BASE = 'http://localhost:3001';
+const URL_BASE = 'http://localhost:3000';
 
 // --- ADMIN: CRUD TAREAS ---
 
@@ -84,7 +84,7 @@ export async function asignarUsuariosATarea(tareaId, userIds) {
     const respuesta = await fetch(`${URL_BASE}/api/tasks/${tareaId}/assign`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ userIds })
+        body: JSON.stringify({ usuarioIds: userIds })
     });
     if (!respuesta.ok) throw new Error('Error al asignar usuarios a la tarea');
     return respuesta.json();
