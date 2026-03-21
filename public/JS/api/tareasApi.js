@@ -5,6 +5,7 @@
 // lanzan un Error si la respuesta HTTP no fue exitosa.
 // ============================================================
 
+// URL base del servidor backend donde se encuentran los endpoints
 const URL_BASE = 'http://localhost:3000';
 
 // --- USUARIOS ---
@@ -15,10 +16,15 @@ const URL_BASE = 'http://localhost:3000';
  * @returns {Object|null} El primer usuario encontrado, o null si no existe.
  */
 export async function obtenerUsuarioPorDocumento(documento) {
-    const respuesta = await fetch(`${URL_BASE}/api/users`);
+    // Se hace una petición GET para obtener todos los usuarios del servidor
+    const respuesta = await fetch(`${URL_BASE}/usuarios`);
+    // Si la respuesta no es exitosa (código 4xx o 5xx), se lanza un error
     if (!respuesta.ok) throw new Error('Error al consultar el usuario');
+    // Se convierte la respuesta JSON a un array de objetos de usuarios
     const usuarios = await respuesta.json();
+    // Se busca en el array el primer usuario cuyo campo documento coincida con el parámetro
     const usuario = usuarios.find(u => u.documento === documento);
+    // Si se encontró el usuario se retorna, si no se retorna null
     return usuario || null;
 }
 
@@ -30,9 +36,15 @@ export async function obtenerUsuarioPorDocumento(documento) {
  * @returns {Array} Lista de tareas.
  */
 export async function obtenerTareasPorUsuario(idUsuario) {
-    const respuesta = await fetch(`${URL_BASE}/api/users/${idUsuario}/tasks`);
+    // Se hace una petición GET para obtener todas las tareas del servidor
+    const respuesta = await fetch(`${URL_BASE}/tasks`);
+    // Si la respuesta falla, se lanza un error descriptivo
     if (!respuesta.ok) throw new Error('Error al obtener las tareas');
-    return respuesta.json();
+    // Se convierte la respuesta JSON a un array de tareas
+    const tareas = await respuesta.json();
+    // Se filtran solo las tareas cuyo userId coincida con el idUsuario recibido
+    // Se usa String() para comparar ambos valores como texto y evitar problemas de tipo
+    return tareas.filter(t => String(t.userId) === String(idUsuario));
 }
 
 /**
@@ -41,12 +53,18 @@ export async function obtenerTareasPorUsuario(idUsuario) {
  * @returns {Object} La tarea creada con su ID asignado.
  */
 export async function crearTareaEnServidor(datosTarea) {
-    const respuesta = await fetch(`${URL_BASE}/api/tasks`, {
+    // Se hace una petición POST al endpoint de tareas para crear una nueva
+    const respuesta = await fetch(`${URL_BASE}/tasks`, {
+        // Se indica que el método HTTP es POST (crear recurso)
         method: 'POST',
+        // Se establece el encabezado para indicar que el cuerpo es JSON
         headers: { 'Content-Type': 'application/json' },
+        // Se convierte el objeto de datos a una cadena JSON para enviarlo al servidor
         body: JSON.stringify(datosTarea)
     });
+    // Si la respuesta no es exitosa, se lanza un error
     if (!respuesta.ok) throw new Error('Error al crear la tarea');
+    // Se retorna la tarea creada (incluye el ID asignado por el servidor)
     return respuesta.json();
 }
 
@@ -57,12 +75,18 @@ export async function crearTareaEnServidor(datosTarea) {
  * @returns {Object} La tarea actualizada.
  */
 export async function actualizarTareaEnServidor(id, cambios) {
-    const respuesta = await fetch(`${URL_BASE}/api/tasks/${id}`, {
+    // Se hace una petición PUT al endpoint de la tarea específica usando su ID
+    const respuesta = await fetch(`${URL_BASE}/tasks/${id}`, {
+        // PUT reemplaza completamente el recurso con los nuevos datos
         method: 'PUT',
+        // Se indica que el contenido enviado es JSON
         headers: { 'Content-Type': 'application/json' },
+        // Se envían los datos actualizados como JSON
         body: JSON.stringify(cambios)
     });
+    // Si la respuesta falla, se lanza un error descriptivo
     if (!respuesta.ok) throw new Error('Error al actualizar la tarea');
+    // Se retorna la tarea actualizada desde el servidor
     return respuesta.json();
 }
 
@@ -72,6 +96,8 @@ export async function actualizarTareaEnServidor(id, cambios) {
  * @returns {boolean} true si se eliminó correctamente.
  */
 export async function borrarTareaEnServidor(id) {
-    const respuesta = await fetch(`${URL_BASE}/api/tasks/${id}`, { method: 'DELETE' });
+    // Se hace una petición DELETE al endpoint de la tarea usando su ID
+    const respuesta = await fetch(`${URL_BASE}/tasks/${id}`, { method: 'DELETE' });
+    // Se retorna true si la respuesta fue exitosa (código 200-299), false si no
     return respuesta.ok;
 }
