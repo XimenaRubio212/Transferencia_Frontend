@@ -188,9 +188,7 @@ formUsuario?.addEventListener('submit', async (evento) => {
 
     try {
         // Se obtiene el ID de edición del dataset del formulario (null si es creación)
-        const idEditando = formUsuario.dataset.idEditando
-            ? Number(formUsuario.dataset.idEditando)
-            : null;
+        const idEditando = formUsuario.dataset.idEditando || null;
 
         // Si hay ID, se está editando un usuario existente
         if (idEditando) {
@@ -251,9 +249,7 @@ formTareaAdmin?.addEventListener('submit', async (evento) => {
 
     try {
         // Se obtiene el ID de edición del dataset del formulario
-        const idEditando = formTareaAdmin.dataset.idEditando
-            ? Number(formTareaAdmin.dataset.idEditando)
-            : null;
+        const idEditando = formTareaAdmin.dataset.idEditando || null;
 
         // Si hay ID, se actualiza la tarea existente
         if (idEditando) {
