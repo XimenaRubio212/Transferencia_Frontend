@@ -241,16 +241,14 @@ formTareaAdmin?.addEventListener('submit', async (evento) => {
     limpiarErroresTareaAdmin();
 
     // Se obtiene el usuario seleccionado en el selector múltiple (primer seleccionado)
-    const opcionSeleccionada = selectUsuarios.selectedOptions[0];
-    const usuarioIdSeleccionado = opcionSeleccionada ? opcionSeleccionada.value : undefined;
+    const usuariosSeleccionados = Array.from(selectUsuarios.selectedOptions).map(op => op.value);
 
-    // Se construye el objeto con los datos de la tarea desde el formulario
     const datosTarea = {
-        title:       inputTituloAdmin.value.trim(),   // Título de la tarea
-        description: inputDescAdmin.value.trim(),      // Descripción
-        estado:      selectorEstadoAdmin.value,        // Estado seleccionado
-        priority:    selectorPrioAdmin.value,          // Prioridad seleccionada
-        ...(usuarioIdSeleccionado && { userId: usuarioIdSeleccionado }) // Usuario asignado
+        title:       inputTituloAdmin.value.trim(),
+        description: inputDescAdmin.value.trim(),
+        estado:      selectorEstadoAdmin.value,
+        priority:    selectorPrioAdmin.value,
+        userIds:     usuariosSeleccionados
     };
 
     try {

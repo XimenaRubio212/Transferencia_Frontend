@@ -94,18 +94,19 @@ export function iniciarCreacionTareaAdmin(usuarios) {
  * @param {Object} manejadores
  */
 export async function crearTareaAdmin(datosTarea, manejadores) {
-    // Se envían los datos al servidor para crear la nueva tarea
-    // El usuarioId ya viene incluido en datosTarea desde admin.js
-    const tareaCreada = await crearTareaAdminEnServidor(datosTarea);
+    const resultado = await crearTareaAdminEnServidor(datosTarea);
 
-    // Se agrega la tarea creada a la lista interna
-    _todasLasTareas.push(tareaCreada);
-    // Se recarga toda la tabla para sincronizar con el servidor
+    // Si el backend devuelve un array (múltiples usuarios), lo agrega todo
+    if (Array.isArray(resultado)) {
+        _todasLasTareas.push(...resultado);
+        notificarExito(`${resultado.length} tareas creadas correctamente.`);
+    } else {
+        _todasLasTareas.push(resultado);
+        notificarExito('Tarea creada correctamente.');
+    }
+
     await cargarTodasLasTareas(manejadores);
-    // Se cierra el modal de creación
     cerrarModalTareaAdmin();
-    // Se notifica al usuario que la tarea fue creada
-    notificarExito('Tarea creada correctamente.');
 }
 
 // ============================================================
