@@ -57,6 +57,8 @@ export async function buscarUsuario(documento, estadoApp) {
         if (usuario) {
             // Se guarda el usuario encontrado en el estado global
             estadoApp.usuarioActual = usuario;
+            // Se persiste el usuario en sessionStorage para sobrevivir F5
+            sessionStorage.setItem('usuarioActual', JSON.stringify(usuario));
             // Se muestra la información del usuario en el panel de la UI
             mostrarInfoUsuario(usuario);
             // Se cargan las tareas asignadas a ese usuario
@@ -66,6 +68,8 @@ export async function buscarUsuario(documento, estadoApp) {
         } else {
             // Si no se encontró, se limpia el estado del usuario actual
             estadoApp.usuarioActual = null;
+            // Se elimina la sesión guardada ya que el usuario no existe
+            sessionStorage.removeItem('usuarioActual');
             // Se vacía la lista interna de tareas
             _todasLasTareas = [];
             // Se muestra un mensaje de error en la UI
@@ -78,6 +82,7 @@ export async function buscarUsuario(documento, estadoApp) {
     } catch (error) {
         // Si hay un error de conexión, se limpia todo y se muestra el error
         estadoApp.usuarioActual = null;
+        sessionStorage.removeItem('usuarioActual');
         _todasLasTareas = [];
         mostrarErrorBusqueda('Error de conexión con el servidor.');
         estadoApp.cantidadTareas = 0;

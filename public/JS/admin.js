@@ -29,6 +29,7 @@ import {
     inputDescAdmin,
     selectorEstadoAdmin,
     selectorPrioAdmin,
+    selectUsuarios,
     cerrarModalTareaAdmin,
     mostrarErroresTareaAdmin,
     limpiarErroresTareaAdmin,
@@ -181,7 +182,7 @@ formUsuario?.addEventListener('submit', async (evento) => {
     // Se construye el objeto con los datos del formulario
     const datos = {
         nombre:    inputNombreUsuario.value.trim(),     // Nombre del usuario
-        correo:    inputCorreoUsuario.value.trim(),     // Correo electrónico
+        email:    inputCorreoUsuario.value.trim(),     // Correo electrónico
         documento: inputDocumentoUsuario.value.trim(),  // Número de documento
         rol:       selectorRolUsuario.value              // Rol seleccionado
     };
@@ -239,12 +240,17 @@ formTareaAdmin?.addEventListener('submit', async (evento) => {
     // Se limpian los errores visuales
     limpiarErroresTareaAdmin();
 
+    // Se obtiene el usuario seleccionado en el selector múltiple (primer seleccionado)
+    const opcionSeleccionada = selectUsuarios.selectedOptions[0];
+    const usuarioIdSeleccionado = opcionSeleccionada ? opcionSeleccionada.value : undefined;
+
     // Se construye el objeto con los datos de la tarea desde el formulario
     const datosTarea = {
-        titulo:      inputTituloAdmin.value.trim(),   // Título de la tarea
-        descripcion: inputDescAdmin.value.trim(),     // Descripción
-        estado:      selectorEstadoAdmin.value,       // Estado seleccionado
-        prioridad:   selectorPrioAdmin.value          // Prioridad seleccionada
+        title:       inputTituloAdmin.value.trim(),   // Título de la tarea
+        description: inputDescAdmin.value.trim(),      // Descripción
+        estado:      selectorEstadoAdmin.value,        // Estado seleccionado
+        priority:    selectorPrioAdmin.value,          // Prioridad seleccionada
+        ...(usuarioIdSeleccionado && { userId: usuarioIdSeleccionado }) // Usuario asignado
     };
 
     try {
@@ -273,7 +279,7 @@ botonFiltrarAdmin?.addEventListener('click', () => {
     // Se construye el objeto de criterios de filtrado
     const criterios = {
         userId: filtroUsuarioAdmin?.value || undefined, // ID del usuario seleccionado (o undefined si es "todos")
-        estado: filtroEstadoAdmin?.value  || undefined  // Estado seleccionado (o undefined si es "todos")
+        estado:    filtroEstadoAdmin?.value  || undefined  // Estado seleccionado (o undefined si es "todos")
     };
     // Se llama al servicio para filtrar las tareas con los criterios
     aplicarFiltroTareasAdmin(criterios, manejadoresTareas);

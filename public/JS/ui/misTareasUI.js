@@ -32,7 +32,7 @@ export function mostrarInfoUsuarioMisTareas(usuario) {
     // Se muestra el nombre del usuario en el span correspondiente
     document.getElementById('miTareasNombre').textContent = usuario.nombre;
     // Se muestra el correo del usuario
-    document.getElementById('miTareasCorreo').textContent = usuario.correo;
+    document.getElementById('miTareasCorreo').textContent = usuario.email;
     // Se hace visible el panel de información del usuario
     panelInfoUsuario.classList.remove('hidden');
     // Se hace visible la sección de tareas
@@ -88,14 +88,13 @@ export function renderizarMisTareas(tareas, manejadores) {
  * @returns {HTMLElement}
  */
 export function crearTarjetaMiTarea(tarea, manejadores = {}) {
-    // Se desestructuran los datos de la tarea
-    const { id, titulo, descripcion, estado, prioridad } = tarea;
+    // Se desestructuran los datos de la tarea usando los nombres reales del backend
+    const { id, title: titulo, description: descripcion, estado, priority: prioridad } = tarea;
 
-    // Se define el color según la prioridad de la tarea
+    // Se define el color según la prioridad de la tarea (soporta mayúsculas y minúsculas)
     const colorPrioridad = {
-        Alta:  '#ef4444',   // Rojo para prioridad alta
-        Media: '#f59e0b',   // Amarillo para prioridad media
-        Baja:  '#10b981'    // Verde para prioridad baja
+        Alta:  '#ef4444', Media: '#f59e0b', Baja:  '#10b981',
+        alto:  '#ef4444', medio: '#f59e0b', bajo:  '#10b981'
     }[prioridad] ?? '#10b981';
 
     // Se crea el elemento div principal de la tarjeta

@@ -60,13 +60,16 @@ const referenciasCampos = {
  */
 export function crearTarjetaTarea(tarea, manejadores = {}) {
     // Se desestructuran los datos de la tarea para acceder fácilmente
-    const { id, titulo, descripcion, estado, prioridad } = tarea;
+    const { id, title: titulo, description: descripcion, estado, priority: prioridad } = tarea;
 
     // Se define un mapa de colores según la prioridad de la tarea
     const colorPrioridad = {
         Alta: '#ef4444',    // Rojo para prioridad alta
         Media: '#f59e0b',   // Amarillo para prioridad media
-        Baja: '#10b981'     // Verde para prioridad baja
+        Baja: '#10b981',    // Verde para prioridad baja
+        alto: '#ef4444',
+        medio: '#f59e0b',
+        bajo: '#10b981'
     }[prioridad] ?? '#10b981'; // Por defecto verde si no hay prioridad
 
     // --- Construcción de la tarjeta ---
@@ -156,7 +159,7 @@ export function mostrarInfoUsuario(usuario) {
     // Se muestra el nombre del usuario en el span correspondiente
     document.getElementById('infoNombre').textContent = usuario.nombre;
     // Se muestra el correo del usuario
-    document.getElementById('infoCorreo').textContent = usuario.correo;
+    document.getElementById('infoCorreo').textContent = usuario.email;
     // Se hace visible el panel de información del usuario
     panelUsuario.classList.remove('hidden');
     // Se hace visible la sección de tareas

@@ -105,15 +105,15 @@ export function renderizarTablaUsuarios(usuarios, manejadores) {
  * @returns {HTMLElement}
  */
 function _crearFilaUsuario(usuario, manejadores) {
-    // Se desestructuran los datos del usuario
-    const { id, nombre, correo, documento, rol, activo } = usuario;
+    // Se desestructuran los datos del usuario (backend retorna 'email', no 'correo')
+    const { id, nombre, email: correo, documento, rol, estado } = usuario;
 
     // Se crea el elemento <tr> para la fila
     const fila = document.createElement('tr');
     // Se guarda el ID del usuario como atributo data-id
     fila.dataset.id = id;
     // Si el usuario está inactivo, se agrega una clase CSS especial
-    if (!activo) fila.classList.add('fila--inactiva');
+    if (estado !== 'activo') fila.classList.add('fila--inactiva');
 
     // Celdas de datos simples
     // Se crea la celda del ID
@@ -145,8 +145,8 @@ function _crearFilaUsuario(usuario, manejadores) {
     const celdaEstado = document.createElement('td');
     // Se crea un <span> con clase CSS que cambia según el estado (activo/inactivo)
     const spanEstado = document.createElement('span');
-    spanEstado.className = `badge badge--${activo ? 'activo' : 'inactivo'}`;
-    spanEstado.textContent = activo ? 'Activo' : 'Inactivo';
+    spanEstado.className = `badge badge--${estado === 'activo' ? 'activo' : 'inactivo'}`;
+    spanEstado.textContent = estado === 'activo' ? 'Activo' : 'Inactivo';
     celdaEstado.appendChild(spanEstado);
 
     // Celda Acciones (contendrá los botones)
@@ -176,10 +176,11 @@ function _crearFilaUsuario(usuario, manejadores) {
     // Botón Activar/Desactivar (cambia su texto y estilo según el estado actual)
     const botonEstado = document.createElement('button');
     // Se usa clase warning si está activo (para desactivar), success si está inactivo (para activar)
-    botonEstado.className = `btn btn--small ${activo ? 'btn--warning' : 'btn--success'}`;
-    botonEstado.textContent = activo ? 'Desactivar' : 'Activar';
+    const estaActivo = estado === 'activo'
+    botonEstado.className = `btn btn--small ${estaActivo ? 'btn--warning' : 'btn--success'}`;
+    botonEstado.textContent = estaActivo ? 'Desactivar' : 'Activar';
     // Al hacer clic, se ejecuta el callback alCambiarEstado con el ID y el estado opuesto
-    botonEstado.addEventListener('click', () => manejadores.alCambiarEstado?.(id, !activo));
+    botonEstado.addEventListener('click', () => manejadores.alCambiarEstado?.(id, !estaActivo));
 
     // Se agregan los tres botones a la celda de acciones
     celdaAcciones.append(botonEditar, botonEstado, botonEliminar);
@@ -205,9 +206,9 @@ export function abrirModalUsuario(usuario = null) {
     if (usuario) {
         // Se cambia el título del modal a "Editar Usuario"
         tituloModalUsuario.textContent = 'Editar Usuario';
-        // Se pre-rellenan los campos con los datos del usuario
+        // Se pre-rellenan los campos con los datos del usuario (backend retorna 'email')
         inputNombreUsuario.value    = usuario.nombre    ?? '';
-        inputCorreoUsuario.value    = usuario.correo    ?? '';
+        inputCorreoUsuario.value    = usuario.email     ?? '';
         inputDocumentoUsuario.value = usuario.documento ?? '';
         selectorRolUsuario.value    = usuario.rol       ?? '';
         // Se guarda el ID del usuario en el dataset del formulario para saber que es edición

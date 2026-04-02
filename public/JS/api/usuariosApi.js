@@ -3,8 +3,9 @@
 // Responsabilidad: comunicación HTTP con los endpoints de usuarios.
 // ============================================================
 
+
 // URL base del servidor backend donde corren los endpoints
-const URL_BASE = 'http://localhost:3000';
+const URL_BASE = 'http://localhost:3000/api';
 
 /**
  * Obtiene la lista completa de usuarios del sistema.
@@ -12,11 +13,11 @@ const URL_BASE = 'http://localhost:3000';
  */
 export async function obtenerTodosLosUsuarios() {
     // Se hace una petición GET al endpoint /usuarios para traer todos los usuarios
-    const respuesta = await fetch(`${URL_BASE}/usuarios`);
+    const respuesta = await fetch(`${URL_BASE}/users`);
     // Si la respuesta no es exitosa (código 4xx o 5xx), se lanza un error
     if (!respuesta.ok) throw new Error('Error al obtener la lista de usuarios');
-    // Se convierte la respuesta a JSON y se retorna el array de usuarios
-    return respuesta.json();
+    const json = await respuesta.json();
+    return json.data;
 }
 
 /**
@@ -26,7 +27,7 @@ export async function obtenerTodosLosUsuarios() {
  */
 export async function crearUsuarioEnServidor(datos) {
     // Se hace una petición POST al endpoint /usuarios para crear un nuevo usuario
-    const respuesta = await fetch(`${URL_BASE}/usuarios`, {
+    const respuesta = await fetch(`${URL_BASE}/users`, {
         // Método POST indica que se está creando un nuevo recurso
         method: 'POST',
         // Se indica que el cuerpo de la petición es JSON
@@ -36,8 +37,8 @@ export async function crearUsuarioEnServidor(datos) {
     });
     // Si la respuesta falla, se lanza un error descriptivo
     if (!respuesta.ok) throw new Error('Error al crear el usuario');
-    // Se retorna el usuario creado (incluye el ID asignado por el servidor)
-    return respuesta.json();
+    const json = await respuesta.json();
+    return json.data;
 }
 
 /**
@@ -48,7 +49,7 @@ export async function crearUsuarioEnServidor(datos) {
  */
 export async function actualizarUsuarioEnServidor(id, datos) {
     // Se hace una petición PUT al usuario específico usando su ID en la URL
-    const respuesta = await fetch(`${URL_BASE}/usuarios/${id}`, {
+    const respuesta = await fetch(`${URL_BASE}/users/${id}`, {
         // PUT reemplaza completamente el recurso con los nuevos datos
         method: 'PUT',
         // Se indica que el contenido enviado es JSON
@@ -58,8 +59,8 @@ export async function actualizarUsuarioEnServidor(id, datos) {
     });
     // Si la respuesta no es exitosa, se lanza un error
     if (!respuesta.ok) throw new Error('Error al actualizar el usuario');
-    // Se retorna el usuario actualizado desde el servidor
-    return respuesta.json();
+    const json = await respuesta.json();
+    return json.data;
 }
 
 /**
@@ -69,7 +70,7 @@ export async function actualizarUsuarioEnServidor(id, datos) {
  */
 export async function eliminarUsuarioEnServidor(id) {
     // Se hace una petición DELETE al usuario específico usando su ID
-    const respuesta = await fetch(`${URL_BASE}/usuarios/${id}`, { method: 'DELETE' });
+    const respuesta = await fetch(`${URL_BASE}/users/${id}`, { method: 'DELETE' });
     // Se retorna true si la eliminación fue exitosa, false si no
     return respuesta.ok;
 }
@@ -82,16 +83,16 @@ export async function eliminarUsuarioEnServidor(id) {
  */
 export async function cambiarEstadoUsuarioEnServidor(id, activo) {
     // Se hace una petición PATCH para modificar parcialmente el usuario (solo el campo activo)
-    const respuesta = await fetch(`${URL_BASE}/usuarios/${id}`, {
+    const respuesta = await fetch(`${URL_BASE}/users/${id}/status`, {
         // PATCH actualiza solo los campos enviados, sin reemplazar todo el recurso
         method: 'PATCH',
-        // Se indica que el contenido es JSON
-        headers: { 'Content-Type': 'application/json' },
-        // Se envía solo el campo activo con su nuevo valor (true o false)
-        body: JSON.stringify({ activo })
+    
+        headers: {'Content-Type': 'application/json'},
+    // Se envía solo el campo activo con su nuevo valor (true o false)
+        body: JSON.stringify({ estado: activo ? 'activo' : 'inactivo' })
     });
     // Si la respuesta falla, se lanza un error
     if (!respuesta.ok) throw new Error('Error al cambiar el estado del usuario');
-    // Se retorna el usuario con el estado actualizado
-    return respuesta.json();
+    const json = await respuesta.json();
+    return json.data;
 }

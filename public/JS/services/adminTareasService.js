@@ -10,20 +10,20 @@ import {
     filtrarTareasAdmin,
     crearTareaAdminEnServidor,
     actualizarTareaAdminEnServidor,
-    eliminarTareaAdminEnServidor,
-    asignarUsuariosATarea
+    eliminarTareaAdminEnServidor
 } from '../api/adminTareasApi.js';
 
 // Se importan las funciones de la capa UI para manipular el DOM
 import {
     renderizarTablaTareas,
     abrirModalTareaAdmin,
-    cerrarModalTareaAdmin,
-    obtenerUsuariosSeleccionados
+    cerrarModalTareaAdmin
 } from '../ui/adminTareasUI.js';
 
 // Se importan las funciones de notificación para mostrar mensajes al usuario
 import { notificarExito, notificarError, notificarInfo } from '../utils/notificaciones.js';
+// Se importa la función para obtener los usuarios cacheados y mostrar sus nombres en la tabla
+import { obtenerUsuariosCacheados } from './usuariosService.js';
 
 // ============================================================
 // ESTADO INTERNO
@@ -44,8 +44,8 @@ export async function cargarTodasLasTareas(manejadores) {
     try {
         // Se obtienen todas las tareas del servidor
         _todasLasTareas = await obtenerTodasLasTareas();
-        // Se renderizan las tareas en la tabla del DOM
-        renderizarTablaTareas(_todasLasTareas, manejadores);
+        // Se renderizan las tareas en la tabla del DOM, pasando usuarios para mostrar nombres
+        renderizarTablaTareas(_todasLasTareas, manejadores, obtenerUsuariosCacheados());
     } catch (error) {
         // Si hay error de conexión, se muestra una notificación
         notificarError('No se pudo cargar la lista de tareas.');
@@ -65,8 +65,8 @@ export async function aplicarFiltroTareasAdmin(criterios, manejadores) {
     try {
         // Se obtienen las tareas filtradas según los criterios (userId, estado)
         const resultado = await filtrarTareasAdmin(criterios);
-        // Se renderizan solo las tareas que pasaron el filtro
-        renderizarTablaTareas(resultado, manejadores);
+        // Se renderizan solo las tareas que pasaron el filtro, pasando usuarios para mostrar nombres
+        renderizarTablaTareas(resultado, manejadores, obtenerUsuariosCacheados());
         // Se notifica al usuario cuántas tareas se están mostrando
         notificarInfo(`Mostrando ${resultado.length} tarea(s) con los filtros aplicados.`);
     } catch (error) {
@@ -95,29 +95,8 @@ export function iniciarCreacionTareaAdmin(usuarios) {
  */
 export async function crearTareaAdmin(datosTarea, manejadores) {
     // Se envían los datos al servidor para crear la nueva tarea
+    // El usuarioId ya viene incluido en datosTarea desde admin.js
     const tareaCreada = await crearTareaAdminEnServidor(datosTarea);
-
-    // Se obtienen los IDs de usuarios seleccionados en el <select multiple>
-    const userIds = obtenerUsuariosSeleccionados();
-    // Si se seleccionaron usuarios, se intenta asignarlos a la tarea
-    if (userIds.length > 0) {
-        try {
-            // Se envía la petición para asignar los usuarios a la tarea creada
-            await asignarUsuariosATarea(tareaCreada.id, userIds);
-        } catch {
-            // Si falla la asignación pero la tarea ya fue creada:
-            // Se agrega la tarea a la lista interna
-            _todasLasTareas.push(tareaCreada);
-            // Se recarga la tabla para mostrar la tarea sin los usuarios asignados
-            await cargarTodasLasTareas(manejadores);
-            // Se cierra el modal
-            cerrarModalTareaAdmin();
-            // Se notifica que la tarea fue creada pero la asignación falló
-            notificarError('Tarea creada, pero hubo un error al asignar los usuarios. Edita la tarea para reintentar.');
-            // Se detiene la ejecución para no llegar al mensaje de éxito
-            return;
-        }
-    }
 
     // Se agrega la tarea creada a la lista interna
     _todasLasTareas.push(tareaCreada);
@@ -125,8 +104,8 @@ export async function crearTareaAdmin(datosTarea, manejadores) {
     await cargarTodasLasTareas(manejadores);
     // Se cierra el modal de creación
     cerrarModalTareaAdmin();
-    // Se notifica al usuario que todo fue exitoso
-    notificarExito('Tarea creada y usuarios asignados correctamente.');
+    // Se notifica al usuario que la tarea fue creada
+    notificarExito('Tarea creada correctamente.');
 }
 
 // ============================================================
@@ -151,26 +130,8 @@ export function iniciarEdicionTareaAdmin(tarea, usuarios) {
  */
 export async function guardarEdicionTareaAdmin(id, datosTarea, manejadores) {
     // Se envían los datos actualizados al servidor
+    // El usuarioId ya viene incluido en datosTarea desde admin.js
     const tareaActualizada = await actualizarTareaAdminEnServidor(id, datosTarea);
-
-    // Se obtienen los IDs de usuarios seleccionados en el selector múltiple
-    const userIds = obtenerUsuariosSeleccionados();
-    try {
-        // Se intenta actualizar la asignación de usuarios en el servidor
-        await asignarUsuariosATarea(id, userIds);
-    } catch {
-        // Si falla la reasignación pero la tarea sí fue actualizada:
-        // Se actualiza la tarea en la lista interna
-        const indice = _todasLasTareas.findIndex(t => t.id === id);
-        if (indice !== -1) _todasLasTareas[indice] = tareaActualizada;
-        // Se recarga la tabla
-        await cargarTodasLasTareas(manejadores);
-        // Se cierra el modal
-        cerrarModalTareaAdmin();
-        // Se notifica el error parcial
-        notificarError('Tarea actualizada, pero hubo un error al guardar la asignación de usuarios.');
-        return;
-    }
 
     // Se actualiza la tarea en la lista interna con la versión del servidor
     const indice = _todasLasTareas.findIndex(t => t.id === id);
@@ -206,7 +167,7 @@ export async function eliminarTareaAdmin(id, manejadores) {
             // Se remueve la tarea de la lista interna filtrando por ID
             _todasLasTareas = _todasLasTareas.filter(t => t.id !== id);
             // Se re-renderiza la tabla sin la tarea eliminada
-            renderizarTablaTareas(_todasLasTareas, manejadores);
+            renderizarTablaTareas(_todasLasTareas, manejadores, obtenerUsuariosCacheados());
             // Se notifica al usuario que la tarea fue eliminada
             notificarExito('Tarea eliminada correctamente.');
         } else {

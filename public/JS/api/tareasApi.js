@@ -6,7 +6,7 @@
 // ============================================================
 
 // URL base del servidor backend donde se encuentran los endpoints
-const URL_BASE = 'http://localhost:3000';
+const URL_BASE = 'http://localhost:3000/api';
 
 // --- USUARIOS ---
 
@@ -17,15 +17,15 @@ const URL_BASE = 'http://localhost:3000';
  */
 export async function obtenerUsuarioPorDocumento(documento) {
     // Se hace una petición GET para obtener todos los usuarios del servidor
-    const respuesta = await fetch(`${URL_BASE}/usuarios`);
+    const respuesta = await fetch(`${URL_BASE}/users`);
     // Si la respuesta no es exitosa (código 4xx o 5xx), se lanza un error
-    if (!respuesta.ok) throw new Error('Error al consultar el usuario');
+    if (!respuesta.ok) throw new Error('Error al obtener los usuarios');
     // Se convierte la respuesta JSON a un array de objetos de usuarios
-    const usuarios = await respuesta.json();
-    // Se busca en el array el primer usuario cuyo campo documento coincida con el parámetro
-    const usuario = usuarios.find(u => u.documento === documento);
+    const json = await respuesta.json();
+    // Se extrae el array de usuarios de la propiedad data
+    const usuarios = json.data;
     // Si se encontró el usuario se retorna, si no se retorna null
-    return usuario || null;
+    return usuarios.find(u => String(u.documento) === String(documento)) ?? null;
 }
 
 // --- TAREAS ---
@@ -41,9 +41,10 @@ export async function obtenerTareasPorUsuario(idUsuario) {
     // Si la respuesta falla, se lanza un error descriptivo
     if (!respuesta.ok) throw new Error('Error al obtener las tareas');
     // Se convierte la respuesta JSON a un array de tareas
-    const tareas = await respuesta.json();
+    const json = await respuesta.json();
+    // Se extrae el array de tareas de la propiedad data
+    const tareas = json.data;
     // Se filtran solo las tareas cuyo userId coincida con el idUsuario recibido
-    // Se usa String() para comparar ambos valores como texto y evitar problemas de tipo
     return tareas.filter(t => String(t.userId) === String(idUsuario));
 }
 
@@ -64,8 +65,9 @@ export async function crearTareaEnServidor(datosTarea) {
     });
     // Si la respuesta no es exitosa, se lanza un error
     if (!respuesta.ok) throw new Error('Error al crear la tarea');
-    // Se retorna la tarea creada (incluye el ID asignado por el servidor)
-    return respuesta.json();
+    // Se extrae la tarea creada de la propiedad data
+    const json = await respuesta.json();
+    return json.data;
 }
 
 /**
@@ -86,8 +88,9 @@ export async function actualizarTareaEnServidor(id, cambios) {
     });
     // Si la respuesta falla, se lanza un error descriptivo
     if (!respuesta.ok) throw new Error('Error al actualizar la tarea');
-    // Se retorna la tarea actualizada desde el servidor
-    return respuesta.json();
+    // Se extrae la tarea actualizada de la propiedad data
+    const json = await respuesta.json();
+    return json.data;
 }
 
 /**

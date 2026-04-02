@@ -64,10 +64,10 @@ const estadoApp = {
 // Se define la función que se ejecuta cuando el usuario hace clic en "Editar" una tarea
 estadoApp.alEditar = function (tarea) {
     // Se pre-rellenan los campos del formulario con los datos de la tarea seleccionada
-    inputTitulo.value       = tarea.titulo;
-    inputDescripcion.value  = tarea.descripcion;
+    inputTitulo.value       = tarea.title;
+    inputDescripcion.value  = tarea.description;
     selectorEstado.value    = tarea.estado;
-    selectorPrioridad.value = tarea.prioridad;
+    selectorPrioridad.value = tarea.priority;
     // Se guarda el ID de la tarea para saber que estamos en modo edición
     estadoApp.idTareaEditando = tarea.id;
     // Se pone el foco en el campo de título para que el usuario empiece a editar
@@ -166,11 +166,11 @@ formularioTarea.addEventListener('submit', async (evento) => {
 
     // Se construye el objeto con los datos de la tarea desde los campos del formulario
     const datosTarea = {
-        userId:      estadoApp.usuarioActual.id,       // ID del usuario al que pertenece la tarea
-        titulo:      inputTitulo.value.trim(),          // Título de la tarea
-        descripcion: inputDescripcion.value.trim(),     // Descripción de la tarea
+        userId:      estadoApp.usuarioActual.id,        // ID del usuario al que pertenece la tarea
+        title:       inputTitulo.value.trim(),          // Título de la tarea
+        description: inputDescripcion.value.trim(),     // Descripción de la tarea
         estado:      selectorEstado.value,              // Estado seleccionado
-        prioridad:   selectorPrioridad.value            // Prioridad seleccionada
+        priority:    selectorPrioridad.value            // Prioridad seleccionada
     };
 
     try {
@@ -219,6 +219,30 @@ function aplicarControles() {
     // Se aplican los filtros y el ordenamiento sobre las tareas
     aplicarFiltroYOrden(criterios, ordenConfig, estadoApp);
 }
+
+// ============================================================
+// RESTAURAR USUARIO AL RECARGAR (sessionStorage)
+// ============================================================
+// Al cargar la página, si había un usuario guardado se restaura automáticamente
+(async function restaurarSesion() {
+    const guardado = sessionStorage.getItem('usuarioActual');
+    if (!guardado) return;
+    try {
+        const usuario = JSON.parse(guardado);
+        // Se restaura el usuario en el estado global
+        estadoApp.usuarioActual = usuario;
+        // Se muestra su información en el panel sin hacer otra petición al servidor
+        const { mostrarInfoUsuario } = await import('./ui/tareasUI.js');
+        mostrarInfoUsuario(usuario);
+        // Se cargan sus tareas desde el servidor
+        await cargarTareasDeUsuario(usuario.id, estadoApp);
+        // Se pre-rellena el campo de documento para referencia visual
+        inputDocumento.value = usuario.documento ?? '';
+    } catch {
+        // Si el JSON está corrupto, se limpia la sesión
+        sessionStorage.removeItem('usuarioActual');
+    }
+})();
 
 // Se escucha el evento change en cada selector para aplicar los controles automáticamente
 selectorFiltroEstado?.addEventListener('change', aplicarControles);

@@ -5,7 +5,7 @@
 // ============================================================
 
 // URL base del servidor backend
-const URL_BASE = 'http://localhost:3000';
+const URL_BASE = 'http://localhost:3000/api';
 
 // --- ADMIN: CRUD TAREAS ---
 
@@ -18,8 +18,8 @@ export async function obtenerTodasLasTareas() {
     const respuesta = await fetch(`${URL_BASE}/tasks`);
     // Si la respuesta no es exitosa, se lanza un error
     if (!respuesta.ok) throw new Error('Error al obtener las tareas');
-    // Se convierte la respuesta a JSON y se retorna el array de tareas
-    return respuesta.json();
+    const json = await respuesta.json();
+    return json.data;
 }
 
 /**
@@ -32,8 +32,8 @@ export async function filtrarTareasAdmin(criterios) {
     const respuesta = await fetch(`${URL_BASE}/tasks`);
     // Si la respuesta falla, se lanza un error descriptivo
     if (!respuesta.ok) throw new Error('Error al filtrar las tareas');
-    // Se convierte la respuesta a un array de tareas
-    let tareas = await respuesta.json();
+    const jsonFiltro = await respuesta.json();
+    let tareas = jsonFiltro.data;
 
     // Si se proporcionó un userId, se filtran solo las tareas de ese usuario
     if (criterios.userId) {
@@ -65,8 +65,8 @@ export async function crearTareaAdminEnServidor(datos) {
     });
     // Si la respuesta no es exitosa, se lanza un error
     if (!respuesta.ok) throw new Error('Error al crear la tarea');
-    // Se retorna la tarea creada con su ID asignado
-    return respuesta.json();
+    const json = await respuesta.json();
+    return json.data;
 }
 
 /**
@@ -87,8 +87,8 @@ export async function actualizarTareaAdminEnServidor(id, datos) {
     });
     // Si la respuesta falla, se lanza un error
     if (!respuesta.ok) throw new Error('Error al actualizar la tarea');
-    // Se retorna la tarea actualizada desde el servidor
-    return respuesta.json();
+    const json = await respuesta.json();
+    return json.data;
 }
 
 /**
@@ -121,8 +121,8 @@ export async function asignarUsuariosATarea(tareaId, userIds) {
     });
     // Si la respuesta falla, se lanza un error
     if (!respuesta.ok) throw new Error('Error al asignar usuarios a la tarea');
-    // Se retorna el resultado de la asignación
-    return respuesta.json();
+    const json = await respuesta.json();
+    return json.data;
 }
 
 // --- VISTA USUARIO: MIS TAREAS ---
@@ -137,8 +137,8 @@ export async function obtenerTareasDeUsuario(userId) {
     const respuesta = await fetch(`${URL_BASE}/tasks`);
     // Si la respuesta no es exitosa, se lanza un error
     if (!respuesta.ok) throw new Error('Error al obtener las tareas del usuario');
-    // Se convierte la respuesta a un array de tareas
-    const tareas = await respuesta.json();
+    const json = await respuesta.json();
+    const tareas = json.data;
     // Se filtran solo las tareas cuyo userId coincida con el usuario solicitado
     return tareas.filter(t => String(t.userId) === String(userId));
 }
@@ -160,6 +160,6 @@ export async function marcarTareaComoCompletada(id) {
     });
     // Si la respuesta falla, se lanza un error
     if (!respuesta.ok) throw new Error('Error al marcar la tarea como completada');
-    // Se retorna la tarea con su estado actualizado
-    return respuesta.json();
+    const json = await respuesta.json();
+    return json.data;
 }

@@ -49,8 +49,9 @@ export const referenciasCamposTarea = {
  * Renderiza la tabla de tareas en el panel admin.
  * @param {Array} tareas
  * @param {Object} manejadores - { alEditar(tarea), alEliminar(id) }
+ * @param {Array} usuarios - Lista de usuarios para mostrar nombre en vez de ID
  */
-export function renderizarTablaTareas(tareas, manejadores) {
+export function renderizarTablaTareas(tareas, manejadores, usuarios = []) {
     // Se limpia todo el contenido anterior del contenedor
     contenedorTablaTareas.innerHTML = '';
 
@@ -88,7 +89,7 @@ export function renderizarTablaTareas(tareas, manejadores) {
     const fragmento = document.createDocumentFragment();
     // Se recorre cada tarea y se crea su fila
     tareas.forEach(tarea => {
-        fragmento.appendChild(_crearFilaTarea(tarea, manejadores));
+        fragmento.appendChild(_crearFilaTarea(tarea, manejadores, usuarios));
     });
     cuerpo.appendChild(fragmento);
     tabla.appendChild(cuerpo);
@@ -100,17 +101,19 @@ export function renderizarTablaTareas(tareas, manejadores) {
 /**
  * Crea una fila <tr> con los datos de una tarea.
  */
-function _crearFilaTarea(tarea, manejadores) {
-    // Se desestructuran los datos de la tarea
-    const { id, titulo, estado, prioridad, usuarios } = tarea;
+function _crearFilaTarea(tarea, manejadores, usuarios = []) {
+    // Se desestructuran los datos de la tarea usando los nombres reales del backend
+    const { id, title: titulo, estado, priority: prioridad, userId } = tarea;
 
-    // Se define un mapa de colores según la prioridad
-    const colorPrioridad = { Alta: '#ef4444', Media: '#f59e0b', Baja: '#10b981' }[prioridad] ?? '#10b981';
+    // Se define un mapa de colores según la prioridad (soporta mayúsculas y minúsculas)
+    const colorPrioridad = {
+        Alta: '#ef4444', Media: '#f59e0b', Baja: '#10b981',
+        alto: '#ef4444', medio: '#f59e0b', bajo: '#10b981'
+    }[prioridad] ?? '#10b981';
 
-    // Se genera el texto de usuarios asignados (nombres separados por coma o guión si no hay)
-    const usuariosTexto = Array.isArray(usuarios) && usuarios.length > 0
-        ? usuarios.map(u => u.nombre ?? u).join(', ')
-        : '—';
+    // Se busca el nombre del usuario asignado en la lista de usuarios cacheados
+    const usuarioAsignado = usuarios.find(u => String(u.id) === String(userId));
+    const usuariosTexto = usuarioAsignado ? usuarioAsignado.nombre : (userId ? String(userId) : '—');
 
     // Se crea el elemento <tr> para la fila
     const fila = document.createElement('tr');
@@ -196,7 +199,7 @@ export function poblarSelectorUsuarios(usuarios, seleccionados = []) {
         // Se asigna el ID del usuario como valor
         opcion.value = u.id;
         // Se muestra el nombre y correo del usuario como texto
-        opcion.textContent = `${u.nombre} (${u.correo})`;
+        opcion.textContent = `${u.nombre} (${u.email})`;
         // Si el usuario ya estaba asignado, se marca como seleccionado
         if (seleccionados.includes(u.id)) opcion.selected = true;
         // Se agrega la opción al selector
@@ -233,11 +236,11 @@ export function abrirModalTareaAdmin(tarea = null, usuarios = []) {
     if (tarea) {
         // Se cambia el título del modal
         tituloModalTarea.textContent = 'Editar Tarea';
-        // Se pre-rellenan los campos con los datos de la tarea
-        inputTituloAdmin.value    = tarea.titulo       ?? '';
-        inputDescAdmin.value      = tarea.descripcion  ?? '';
-        selectorEstadoAdmin.value = tarea.estado       ?? '';
-        selectorPrioAdmin.value   = tarea.prioridad    ?? '';
+        // Se pre-rellenan los campos con los datos de la tarea (nombres reales del backend)
+        inputTituloAdmin.value    = tarea.title     ?? '';
+        inputDescAdmin.value      = tarea.description ?? '';
+        selectorEstadoAdmin.value = tarea.estado    ?? '';
+        selectorPrioAdmin.value   = tarea.priority  ?? '';
         // Se guarda el ID de la tarea en el dataset para saber que es edición
         formTareaAdmin.dataset.idEditando = tarea.id;
     } else {
